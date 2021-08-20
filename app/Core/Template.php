@@ -80,7 +80,12 @@ class Template
     {
         extract($__template_args);
         ob_start();
-        include $this->getTemplateFile($__template_name);
+        $includeFile = $this->getTemplateFile($__template_name);
+        if (DEBUG){
+        	$this->app->logger->debug("TPL: ".$file);
+        	echo "<!-- $includeFile -->";
+        }
+        include $includeFile;
         return ob_get_clean();
     }
 
