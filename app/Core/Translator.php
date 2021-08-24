@@ -174,7 +174,13 @@ class Translator
 
         if (file_exists($filename)) {
             self::$locales = array_merge(self::$locales, require($filename));
+        }else{
+			// try to load lang base by reducing underscore part 'de_DE_du' -> 'de_DE' -> 'de'
+        	if ( strripos($language, '_') !== false ){
+        		self::load( substr($language, 0, strripos($language, '_')), $path );
+        	}
         }
+
     }
 
     /**
