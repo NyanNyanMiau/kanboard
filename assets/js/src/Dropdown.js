@@ -14,6 +14,7 @@ Kanboard.Dropdown.prototype.listen = function() {
         $(this).addClass('dropdown-menu');
         $(this).removeClass('active-dropdown-menu');
         self.close();
+        return false;
     });
 
     $(document).on('click', '.dropdown-menu', function(e) {
@@ -79,5 +80,6 @@ Kanboard.Dropdown.prototype.close = function() {
         KB.trigger('dropdown.beforeDestroy');
     }
 
+    $(".active-dropdown-menu").removeClass('active-dropdown-menu').addClass('dropdown-menu');
     $("#dropdown").remove();
 };
