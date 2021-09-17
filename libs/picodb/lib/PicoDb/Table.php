@@ -120,6 +120,14 @@ class Table
     private $sqlSelect = '';
 
     /**
+     * SQL union
+     *
+     * @access private
+     * @var    array
+     */
+    private $sqlUnion = '';
+
+    /**
      * SQL joins
      *
      * @access private
@@ -613,6 +621,20 @@ class Table
     }
 
     /**
+     * Union
+     *
+     * @access public
+     * @param  Table   $subquery
+     * @return $this
+     */
+    public function union(Table $subquery)
+    {
+        $this->sqlUnion = ' UNION '.$subquery->buildSelectQuery();
+        $this->conditionBuilder->addValues($subquery->conditionBuilder->getValues());
+        return $this;
+    }
+
+    /**
      * Custom select
      *
      * @access public
@@ -693,7 +715,7 @@ class Table
         $this->groupBy = $this->db->escapeIdentifierList($this->groupBy);
 
         return trim(sprintf(
-            'SELECT %s FROM %s %s %s %s %s %s %s',
+            'SELECT %s FROM %s %s %s %s %s %s %s %s',
             $this->sqlSelect,
             $this->db->escapeIdentifier($this->name),
             implode(' ', $this->joins),
@@ -701,7 +723,8 @@ class Table
             empty($this->groupBy) ? '' : 'GROUP BY '.implode(', ', $this->groupBy),
             $this->sqlOrder,
             $this->sqlLimit,
-            $this->sqlOffset
+            $this->sqlOffset,
+            $this->sqlUnion
         ));
     }
 
