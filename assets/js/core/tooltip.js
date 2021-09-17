@@ -1,27 +1,65 @@
 KB.on('dom.ready', function() {
-    function onMouseOver(mytarget) {
-        if (! exists()) {
-            create(mytarget);
+    function tooltip(mytarget)
+    {
+    	if ( mytarget.__target && document.contains(mytarget.__target) ) return true;
+
+    	// remove other same target tooltip
+    	mytarget.__destroy = function()
+    	{
+    		if ( mytarget.__onChild && document.contains(mytarget.__onChild) ){
+    			return false;
+    		}
+    		// remove
+            if (mytarget.__target) {
+            	mytarget.__target.parentNode && mytarget.__target.parentNode.removeChild(mytarget.__target);
+            	mytarget.__target = null;
+            }
         }
+    	mytarget.__onTooltip = false;
+    	mytarget.__onChild = false;
+    	mytarget.__mouseOnTooltip = function() {
+    		mytarget.__onTooltip = true;
+        }
+
+        var containerElement = document.createElement("div");
+        containerElement.__opener = mytarget;
+        containerElement.addEventListener("mouseleave", mytarget.__destroy, false);
+        containerElement.addEventListener("mouseenter", mytarget.__mouseOnTooltip, false);
+        containerElement.classList.add('tooltip-container');
+
+        mytarget.__target = containerElement;
+
+    	// have open container
+    	var containers = document.getElementsByClassName("tooltip-container");
+    	if ( containers.length ) {
+    		// remove containers where opener is not part of
+    		$.each(containers, function(idx, container){
+    			if ( mytarget.__target && mytarget.__target === container ){
+    				return true;
+    			}
+    			if ( ! (container && container.contains( mytarget )) ) {
+    				container.__opener.__destroy();
+    			}else{
+    				container.__opener.__onChild = containerElement;
+    			}
+    		});
+    	}
+
+        create(mytarget);
+        
+        document.body.appendChild(containerElement);
+
+        
+        mytarget.addEventListener('mouseout', function(e) {
+        	if ( !mytarget.__onTooltip ) return false;
+            setTimeout(function() {
+            	mytarget.__destroy();
+            }, 500);
+        });
     }
 
-    function onMouseLeaveContainer() {
-        setTimeout(destroy, 500);
-    }
 
-    function mouseLeftParent() {
-        setTimeout(destroyIfNotOnTooltip, 500);
-    }
-
-    function mouseOnTooltip() {
-        document.getElementById("tooltip-container").mouseOnTooltip = true;
-    }
-
-    function destroyIfNotOnTooltip() {
-        var div = document.getElementById("tooltip-container");
-        if(div != null && !div.mouseOnTooltip) destroy();
-    }
-
+    
     function create(element) {
         var contentElement = element.querySelector("script");
         if (contentElement) {
@@ -53,13 +91,10 @@ KB.on('dom.ready', function() {
         request.send(null);
     }
 
-    function render(element, html) {        
-        var containerElement = document.createElement("div");
-        containerElement.id = "tooltip-container";
+    function render(element, html) {
+        var containerElement = element.__target;
+        if (!containerElement) return false;
         containerElement.innerHTML = html;
-        containerElement.addEventListener("mouseleave", onMouseLeaveContainer, false);
-        containerElement.addEventListener("mouseenter", mouseOnTooltip, false);
-        containerElement.mouseOnTooltip = false;
 
         var elementRect = element.getBoundingClientRect();
         var top = elementRect.top + window.scrollY + elementRect.height;
@@ -72,45 +107,33 @@ KB.on('dom.ready', function() {
             var left = elementRect.left + window.scrollX;
             containerElement.style.left = left + "px";
         }
-
-        document.body.appendChild(containerElement);
-
-        document.body.onclick = function(event) {
-            if (! containerElement.contains(event.target)) {
-                destroy();
-            }
-        };
     }
 
-    function destroy() {
-        var element = document.getElementById("tooltip-container");
-        if (element) {
-            element.parentNode.removeChild(element);
-        }
-    }
-
-    function exists() {
-        return !!document.getElementById("tooltip-container");
-    }
-    
     // for dynamically added elements, we add our event listeners to the doc body
     // we need to use mouseover, because mouseenter only triggers on the body in this case
     document.body.addEventListener('mouseover', function(e) {
         if (e.target.classList.contains('tooltip')) {
-            onMouseOver(e.target);
+            tooltip(e.target);
         }
         // to catch the case where the event doesn't fire on tooltip but on the i-subelement
         //    (this seems to depend on how you move your mouse over the element ...)
         if (e.target.classList.contains('fa') && e.target.parentNode.classList.contains('tooltip')) {
-            onMouseOver(e.target.parentNode);
+        	tooltip(e.target.parentNode);
         }
     });
-    document.body.addEventListener('mouseout', function(e) {
-        if (e.target.classList.contains('tooltip')) {
-            mouseLeftParent();
-        }
-        if (e.target.classList.contains('fa') && e.target.parentNode.classList.contains('tooltip')) {
-            mouseLeftParent();
-        }
+    
+    document.body.addEventListener('click', function(event) {
+    	var c = document.getElementsByClassName("tooltip-container");
+    	if (c.length){
+    		// remove all
+    		$.each(document.getElementsByClassName("tooltip-container"), function(idx, el){
+    			if ( ! (el && el.contains(event.target)) ) {
+    				if ( el && el.__opener){
+	   					el.__opener && el.__opener.__destroy();
+    				}
+    			}
+    		});
+    	}
     });
+
 });

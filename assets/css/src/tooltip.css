@@ -6,7 +6,7 @@
     color: var(--color-light);
 }
 
-#tooltip-container {
+.tooltip-container {
     padding: 5px;
     background: #fff;
     border: 1px solid #ddd;
@@ -16,10 +16,10 @@
     min-width: 350px
 }
 
-#tooltip-container .markdown p:last-child {
+.tooltip-container .markdown p:last-child {
     margin-bottom: 0
 }
 
-#tooltip-container .tooltip-large {
+.tooltip-container .tooltip-large {
     width: 600px
 }
