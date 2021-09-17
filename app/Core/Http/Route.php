@@ -95,7 +95,7 @@ class Route extends Base
         $items = explode('/', ltrim($path, '/'));
         $count = count($items);
 
-        foreach ($this->paths as $route) {
+        foreach (array_reverse($this->paths) as $route) {
             if ($count === $route['count']) {
                 $params = array();
 
