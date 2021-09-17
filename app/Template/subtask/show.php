@@ -6,5 +6,7 @@
             'task' => $task,
             'editable' => $editable
         )) ?>
+
+        <?= $this->hook->render('template:subtask:show:after-table', array('task' => $task, 'project' => $project, 'subtasks' => $subtasks)) ?>
     </div>
 </details>

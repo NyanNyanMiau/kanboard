@@ -8,5 +8,7 @@
             'editable' => $editable,
             'is_public' => $is_public,
         )) ?>
+
+        <?= $this->hook->render('template:task_internal_link:show:after-table', array('task' => $task, 'project' => $project, 'links' => $links)) ?>
     </div>
 </details>

@@ -6,5 +6,7 @@
             'task' => $task,
             'project' => $project,
         )) ?>
+
+        <?= $this->hook->render('template:task_external_link:show:after-table', array('task' => $task, 'project' => $project, 'links' => $links)) ?>
     </div>
 </details>
