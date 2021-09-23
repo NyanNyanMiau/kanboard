@@ -37,6 +37,14 @@ class Route extends Base
     private $urls = array();
 
     /**
+     * Stores route overrides
+     *
+     * @access private
+     * @var array
+     */
+    private $overrides = [];
+
+    /**
      * Enable routing table
      *
      * @access public
@@ -82,6 +90,60 @@ class Route extends Base
 
         return $this;
     }
+
+    /**
+     * Add Override
+     *
+     * change routes without override punch of templates or master htaccess
+     * override = ['controller'=>'OtherController', 'action'=>'otherAction', 'plugin'=>'otherPlugin']
+     *
+     * @access public
+     * @param  string   $controller
+     * @param  string   $action
+     * @param  string   $plugin
+     * @param  array    $override
+     * @return Route
+     */
+    public function addOverride(string $controller, string $action, string $plugin='', array $override = [])
+    {
+        if ( !isset($this->overrides[$plugin]) ){
+            $this->overrides[$plugin] = [];
+        }
+        if ( !isset($this->overrides[$plugin][$controller]) ){
+            $this->overrides[$plugin][$controller] = [];
+        }
+        if ( !isset($this->overrides[$plugin][$controller][$action]) ){
+            $this->overrides[$plugin][$controller][$action] = [];
+        }
+
+        $this->overrides[$plugin][$controller][$action] = $override;
+
+        return $this;
+    }
+
+    /*
+     * apply override after request and findroute from router
+     *
+     * */
+    public function resolveOverride(&$controller, &$action, &$plugin)
+    {
+        if (   isset($this->overrides[$plugin])
+            && isset($this->overrides[$plugin][$controller])
+            && isset($this->overrides[$plugin][$controller][$action])
+        ){
+            $o = $this->overrides[$plugin][$controller][$action];
+            if ( isset($o['controller']) ){
+                $controller = $o['controller'];
+            }
+            if ( isset($o['action']) ){
+                $action = $o['action'];
+            }
+            if ( isset($o['plugin']) ){
+                $plugin = $o['plugin'];
+            }
+        }
+    }
+
 
     /**
      * Find a route according to the given path

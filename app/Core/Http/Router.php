@@ -111,6 +111,13 @@ class Router extends Base
             $plugin = $route['plugin'];
         }
 
+        $controller = $this->currentControllerName = ucfirst($this->sanitize($controller, self::DEFAULT_CONTROLLER));
+        $action = $this->currentActionName = $this->sanitize($action, self::DEFAULT_METHOD);
+        $plugin = $this->currentPluginName = ucfirst($this->sanitize($plugin));
+
+        // apply overrides
+        $this->route->resolveOverride($controller, $action, $plugin);
+
         $this->currentControllerName = ucfirst($this->sanitize($controller, self::DEFAULT_CONTROLLER));
         $this->currentActionName = $this->sanitize($action, self::DEFAULT_METHOD);
         $this->currentPluginName = ucfirst($this->sanitize($plugin));
