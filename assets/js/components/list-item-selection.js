@@ -48,12 +48,31 @@ document.addEventListener("DOMContentLoaded", function () {
         event.preventDefault();
         var selectedItems = document.querySelectorAll("input[data-list-item=selectable]:checked");
         var taskIDs = [];
-
+        var s = {};
         for (var i = 0; i < selectedItems.length; i++) {
             taskIDs.push(selectedItems[i].value);
+
+            var n = selectedItems[i].name.replace("[", "").replace("]","");
+            if ( n === "tasks") {
+            	n = "task_ids";
+            }
+            if ( n === "subtasks") {
+            	n = "subtask_ids";
+            }
+
+            if ( typeof s[n] === "undefined" ) {
+            	s[n] = [];
+            }
+            s[n].push(selectedItems[i].value);
         }
 
-        var link = event.target.href + "&task_ids=" + taskIDs.join(",");
+//        var link = event.target.href + "&task_ids=" + taskIDs.join(",");
+       var link = event.target.href;
+       var first = event.target.href.indexOf("?") === -1 ? true : false;
+       for (item in s) {
+    	   link += (first ? "?" : "&" ) + item + "=" + s[item].join(",");
+    	   first = false;
+       }
         KB.modal.open(link, "medium", true);
     }
 
