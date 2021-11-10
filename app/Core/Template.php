@@ -82,7 +82,7 @@ class Template
         ob_start();
         $includeFile = $this->getTemplateFile($__template_name);
         if (DEBUG){
-        	$this->app->logger->debug("TPL: ".$file);
+        	$this->app->logger->debug("TPL: ".$includeFile);
         	echo "<!-- $includeFile -->";
         }
         include $includeFile;

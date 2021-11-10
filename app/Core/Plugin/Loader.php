@@ -61,11 +61,27 @@ class Loader extends \Kanboard\Core\Base
 
             $dir = new DirectoryIterator(PLUGINS_DIR);
 
+            $loadOrder = defined("PLUGINS_LOAD_ORDER") && is_array(PLUGINS_LOAD_ORDER) ? PLUGINS_LOAD_ORDER : [];
+            $pluginsToLoad = [];
+
             foreach ($dir as $fileInfo) {
                 if ($fileInfo->isDir() && substr($fileInfo->getFilename(), 0, 1) !== '.') {
-                    $pluginName = $fileInfo->getFilename();
-                    $this->initializePlugin($pluginName);
+                    $pluginsToLoad[] = $fileInfo->getFilename();
                 }
+            }
+            // sort plugins alpha natural
+            asort($pluginsToLoad, SORT_NATURAL);
+
+            foreach ($pluginsToLoad as $pluginName) {
+                // if in load order dont load
+                if (!in_array($pluginName, $loadOrder))
+                    $this->initializePlugin($pluginName);
+            }
+
+            foreach ($loadOrder as $pluginName) {
+                // if plugin from loadorder is in folder then load
+                if (in_array($pluginName, $pluginsToLoad))
+                    $this->initializePlugin($pluginName);
             }
         }
     }
@@ -114,7 +130,8 @@ class Loader extends \Kanboard\Core\Base
         try {
             $plugin = $this->loadPlugin($pluginName);
 
-            if (Version::isCompatible($plugin->getCompatibleVersion(), APP_VERSION)) {
+	    if (Version::isCompatible($plugin->getCompatibleVersion(), APP_VERSION)) {
+		        $this->logger->debug('Load Plugin: '.$pluginName);
                 $this->loadSchema($pluginName);
 
                 if (method_exists($plugin, 'onStartup')) {
