@@ -1,0 +1,35 @@
+version: '3.4'
+x-xdebug-settings: &xdebug-settings
+  XDEBUG_REMOTE_AUTOSTART: "On"
+  XDEBUG_REMOTE_CONNECT_BACK: "Off"
+  XDEBUG_REMOTE_HOST: "127.0.0.1"
+  XDEBUG_PROFILER_ENABLE: "On"
+services:
+  kanboard:
+    image: kanboard/kanboard:latest
+    ports:
+      - "80:80"
+    volumes:
+      - .:/var/www/app/plugins/KanboardCommentActions
+      - ./docker/conf.d/local.ini:/etc/php7/conf.d/local.ini
+      - ./Data/config.php:/var/www/app/data/config.php
+      - .:/usr/share/php7
+    environment:
+      DATABASE_URL: mysql://kb:kb-secret@db/kanboard
+      <<: *xdebug-settings
+  pma:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8000:80"
+    environment:
+      PMA_HOST: db
+      PMA_USER: kb
+      PMA_PASSWORD: kb-secret
+  db:
+    image: mariadb:latest
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: kanboard
+      MYSQL_USER: kb
+      MYSQL_PASSWORD: kb-secret

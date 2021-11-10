@@ -1,0 +1,3 @@
+[submodule "plugins/plugins/Gantt"]
+	path = plugins/plugins/Gantt
+	url = https://github.com/NyanNyanMiau/plugin-gantt.git
