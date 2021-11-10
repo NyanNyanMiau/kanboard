@@ -1,3 +1,6 @@
-[submodule "plugins/plugins/Gantt"]
-	path = plugins/plugins/Gantt
+[submodule "plugins/Gantt"]
+	path = plugins/Gantt
 	url = https://github.com/NyanNyanMiau/plugin-gantt.git
+[submodule "plugins/Greenwing"]
+        path = plugins/Greenwing
+        url = https://github.com/NyanNyanMiau/Greenwing.git
