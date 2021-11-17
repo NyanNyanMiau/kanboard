@@ -75,7 +75,7 @@ class UrlHelper extends Base
      */
     public function icon($icon, $label, $controller, $action, array $params = array(), $csrf = false, $class = '', $title = '', $newTab = false, $anchor = '', $absolute = false)
     {
-        $html = '<i class="fa fa-fw fa-'.$icon.'" aria-hidden="true"></i>'.$label;
+        $html = '<i class="fa fa-fw fa-'.$icon.'" aria-hidden="true"></i><span>'.$label.'</span>';
         return $this->helper->url->link($html, $controller, $action, $params, $csrf, $class, $title, $newTab, $anchor, $absolute);
     }
 
