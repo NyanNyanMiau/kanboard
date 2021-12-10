@@ -30,7 +30,8 @@ class TaskProjectDuplicationModel extends TaskDuplicationModel
 
         if ($new_task_id !== false) {
             $this->tagDuplicationModel->duplicateTaskTagsToAnotherProject($task_id, $new_task_id, $project_id);
-            $this->taskLinkModel->create($new_task_id, $task_id, 4);
+            if (defined(PROJECT_DUPLICATION_ADD_TASK_DUPLINKS) && PROJECT_DUPLICATION_ADD_TASK_DUPLINKS)
+                $this->taskLinkModel->create($new_task_id, $task_id, 4);
         }
 
         $hook_values = [ 'source_task_id' => $task_id, 'destination_task_id' => $new_task_id];
